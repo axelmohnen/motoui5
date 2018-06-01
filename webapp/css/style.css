@@ -1,1 +1,25 @@
 /* Enter your custom styles here */
+.sapUiBlockLayoutCell.customUiBlockCellContent>.sapUiBlockCellContent {
+    padding-top: 0px;
+    padding-right: 2px;
+    padding-bottom: 0px;
+    padding-left: 2px;
+}
+
+.sapMText.customMTextGear{
+	font-size: 2.5rem;
+}
+
+.sapMText.customMTextColorYellowGear{
+	color: #FFFF00 ;
+	font-weight: bold;
+}
+
+.sapMText.customMTextColorBlackGear{
+	color: #000000 !important;
+}
+
+.sapMText.customMTextSpeed{
+	font-size: 8rem;
+	font-weight: bold;
+}
