@@ -30,13 +30,8 @@
 			"tablet": true,
 			"phone": true
 		},
-		"supportedThemes": [
-			"sap_hcb",
-			"sap_belize"
-
-		]
+		"supportedThemes": ["sap_hcb", "sap_belize"]
 	},
-
 	"sap.ui5": {
 		"rootView": {
 			"viewName": "motoui5.motoui5.view.View1",
@@ -77,7 +72,7 @@
 				"controlId": "idAppControl"
 			},
 			"routes": [{
-				"name": "RouteView1",
+				"name": "TargetView1",
 				"pattern": "RouteView1",
 				"target": ["TargetView1"]
 			}],
