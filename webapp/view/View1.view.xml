@@ -1,9 +1,127 @@
-<mvc:View controllerName="motoui5.motoui5.controller.View1" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
-	displayBlock="true" xmlns="sap.m">
+<mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:l="sap.ui.layout"
+	xmlns:si="sap.suite.ui.commons.statusindicator" xmlns:core="sap.ui.core" controllerName="motoui5.motoui5.controller.View1"
+	displayBlock="true">
 	<App id="idAppControl">
 		<pages>
-			<Page title="{i18n>title}">
-				<content></content>
+			<Page title="{i18n>title}" showHeader="false">
+				<content >
+					<Table id="idTableRow1" items="{path: 'TableRow1>/results'}">
+						<columns>
+							<Column width="10%"></Column>
+							<Column width="10%"></Column>
+							<Column width="10%"></Column>
+							<Column width="10%"></Column>
+							<Column width="auto"></Column>
+							<Column width="10%"></Column>
+							<Column width="10%"></Column>
+							<Column width="10%"></Column>
+							<Column width="10%"></Column>
+						</columns>
+						<items>
+							<ColumnListItem vAlign="Middle">
+								<cells>
+									<HBox id="HBoxIdIndicatorLeft" justifyContent="Start">
+										<core:Icon id="IconIndicatorLeft" src="sap-icon://close-command-field" size="1cm" color="#FF8C00" visible="{TableRow1>visibleIndicatorLeft}"></core:Icon>
+									</HBox>
+									<HBox id="HBoxIdHighBeam" justifyContent="Center">
+										<core:Icon id="IconHighBeam" src="sap-icon://status-negative" size="1cm" color="#1E90FF" visible="{TableRow1>visibleHighBeam}"></core:Icon>
+									</HBox>
+									<HBox id="HBoxIdChoke" justifyContent="Center">
+										<core:Icon id="IconChoke" src="sap-icon://synchronize" size="1cm" color="#FF0000" visible="{TableRow1>visibleChoke}"></core:Icon>
+									</HBox>
+									<HBox id="HBox1" justifyContent="Center">
+										<!--<core:Icon id="Icon1" src="sap-icon://synchronize" size="1cm" color="#FF8C00"></core:Icon>-->
+									</HBox>
+									<HBox justifyContent="Center">
+										<Image src="images/BMW_logo.png" height="50px" width="50px"></Image>
+									</HBox>
+									<HBox id="HBoxIdBatteryPower" justifyContent="Center">
+										<core:Icon id="IconBatteryPower" src="sap-icon://crossed-line-chart" size="1cm" color="#FF0000" visible="{TableRow1>visibleBatteryPower}"></core:Icon>
+									</HBox>
+									<HBox id="HBoxIdOilTemp" justifyContent="Center">
+										<core:Icon id="IconOilTemp" src="sap-icon://temperature" size="1cm" color="#FF0000" visible="{TableRow1>visibleOilTemp}"></core:Icon>
+									</HBox>
+									<HBox id="HBoxIdWaterTemp" justifyContent="Center">
+										<core:Icon id="IconWaterTemp" src="sap-icon://heating-cooling" size="1cm" color="#FF0000" visible="{TableRow1>visibleWaterTemp}"></core:Icon>
+									</HBox>
+									<HBox id="HBoxIdIndicatorRight" justifyContent="End">
+										<core:Icon id="IconIndicatorRight" src="sap-icon://open-command-field" size="1cm" color="#FF8C00"
+											visible="{TableRow1>visibleIndicatorRight}"></core:Icon>
+									</HBox>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+					<Table id="idTableRow2" items="{path: 'TableRow2>/results'}">
+						<columns>
+							<Column width="85%"></Column>
+							<Column width="15%"></Column>
+						</columns>
+						<items>
+							<ColumnListItem vAlign="Middle">
+								<cells>
+									<ProgressIndicator percentValue="{TableRow2>rpmPercentValue}" displayValue="{TableRow2>rpmDisplayValue}" showValue="true"
+										state="{TableRow2>rpmState}"/>
+									<HBox justifyContent="End">
+										<Text id="idTextGear" text="{TableRow2>gearValue}" class="customMTextGear customMTextColorYellowGear"/>
+										<Text text="Gear"/>
+									</HBox>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+					<Table id="idTableRow3" items="{path: 'TableRow3>/results'}">
+						<columns>
+							<Column width="10%"></Column>
+							<Column width="auto"></Column>
+							<Column width="45%"></Column>
+						</columns>
+						<items>
+							<ColumnListItem vAlign="Middle">
+								<cells>
+									<VBox justifyContent="Center">
+										<si:StatusIndicator id="StatusIndicatorFuel" height="110px" value="{TableRow3>fuelValue}">
+											<si:ShapeGroup>
+												<si:Rectangle x="0" y="0" width="30" height="100" fullAnimationDuration="2000" fillingType="Linear" animationOnStartup="true"/>
+											</si:ShapeGroup>
+											<si:propertyThresholds>
+												<si:PropertyThreshold fillColor="red" toValue="20"/>
+												<si:PropertyThreshold fillColor="green" toValue="100"/>
+											</si:propertyThresholds>
+										</si:StatusIndicator>
+										<HBox id="HBoxIdFuel" justifyContent="Start">
+											<core:Icon id="IconFuel" src="sap-icon://mileage" size="1cm" color="#4682B4"></core:Icon>
+										</HBox>
+									</VBox>
+									<HBox>
+										<Table id="idTableRow3Info" items="{path: 'TableInfo>/results'}" backgroundDesign="Solid">
+											<columns>
+												<Column width="50%"></Column>
+												<Column width="50%"></Column>
+											</columns>
+											<items>
+												<ColumnListItem vAlign="Middle">
+													<cells>
+														<ComboBox items="{ path: 'ComboBoxInfo>/results'}" width="100%">
+															<core:Item key="{ComboBoxInfo>key}" text="{ComboBoxInfo>text}"/>
+														</ComboBox>
+														<ComboBox items="{ path: 'ComboBoxInfo>/results'}" width="100%">
+															<core:Item key="{ComboBoxInfo>key}" text="{ComboBoxInfo>text}"/>
+														</ComboBox>
+													</cells>
+												</ColumnListItem>
+											</items>
+										</Table>
+									</HBox>
+									<HBox justifyContent="End">
+										<Text text="{TableRow3>speedValue}" class="customMTextSpeed"/>
+										<Text text="Km/h"/>
+									</HBox>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+				</content>
 			</Page>
 		</pages>
 	</App>
