@@ -8,6 +8,7 @@
 
 .sapMText.customMTextGear{
 	font-size: 2.5rem;
+	font-weight: bold;
 }
 
 .sapMText.customMTextColorYellowGear{
@@ -23,3 +24,28 @@
 	font-size: 8rem;
 	font-weight: bold;
 }
+
+#DialogTableInfo-searchField{
+display:none;
+}
+
+.customMLIBShowSeparatorFirst>td {
+    border-top: none;
+}
+
+.customMLIBShowSeparatorLast>td {
+    border-bottom: none;
+}
+
+.customMLIBShowSeparatorCell {
+    border-bottom: none;
+}
+
+.customMListShowSeparatorsAll1 .sapMListShowSeparatorsAll .sapMLIBShowSeparator:last-child>td,.sapMListShowSeparatorsAll .sapMListTblSubRow:last-child>td {
+    border-bottom: none
+}
+
+.customMListShowSeparatorsAll2 .sapMListShowSeparatorsAll .sapMListTblSubRow:last-child>td,.sapMListShowSeparatorsAll .sapMLIBShowSeparator:last-child>td {
+    border-bottom: none
+}
+

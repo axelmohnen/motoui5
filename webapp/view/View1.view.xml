@@ -4,49 +4,51 @@
 	<App id="idAppControl">
 		<pages>
 			<Page title="{i18n>title}" showHeader="false">
-				<content >
+				<content>
 					<Table id="idTableRow1" items="{path: 'TableRow1>/results'}">
 						<columns>
-							<Column width="10%"></Column>
-							<Column width="10%"></Column>
-							<Column width="10%"></Column>
-							<Column width="10%"></Column>
-							<Column width="auto"></Column>
-							<Column width="10%"></Column>
-							<Column width="10%"></Column>
-							<Column width="10%"></Column>
-							<Column width="10%"></Column>
+							<Column width="10%"/>
+							<Column width="10%"/>
+							<Column width="10%"/>
+							<Column width="10%"/>
+							<Column width="auto"/>
+							<Column width="10%"/>
+							<Column width="10%"/>
+							<Column width="10%"/>
+							<Column width="10%"/>
 						</columns>
 						<items>
 							<ColumnListItem vAlign="Middle">
 								<cells>
 									<HBox id="HBoxIdIndicatorLeft" justifyContent="Start">
-										<core:Icon id="IconIndicatorLeft" src="sap-icon://close-command-field" size="1cm" color="#FF8C00" visible="{TableRow1>visibleIndicatorLeft}"></core:Icon>
+										<core:Icon id="IconIndicatorLeft" src="sap-icon://close-command-field" size="1cm" color="#FF8C00" visible="{TableRow1>visibleIndicatorLeft}"/>
 									</HBox>
 									<HBox id="HBoxIdHighBeam" justifyContent="Center">
-										<core:Icon id="IconHighBeam" src="sap-icon://status-negative" size="1cm" color="#1E90FF" visible="{TableRow1>visibleHighBeam}"></core:Icon>
+										<core:Icon id="IconHighBeam" src="sap-icon://status-negative" size="1cm" color="#1E90FF" visible="{TableRow1>visibleHighBeam}"/>
 									</HBox>
 									<HBox id="HBoxIdChoke" justifyContent="Center">
-										<core:Icon id="IconChoke" src="sap-icon://synchronize" size="1cm" color="#FF0000" visible="{TableRow1>visibleChoke}"></core:Icon>
+										<core:Icon id="IconChoke" src="sap-icon://synchronize" size="1cm" color="#FF0000" visible="{TableRow1>visibleChoke}"/>
 									</HBox>
-									<HBox id="HBox1" justifyContent="Center">
-										<!--<core:Icon id="Icon1" src="sap-icon://synchronize" size="1cm" color="#FF8C00"></core:Icon>-->
+									<HBox id="HBoxIdSimulation" justifyContent="Center">
+									<!--	<core:Icon id="IconSimulation" src="sap-icon://simulate" size="1cm" color="#FF8C00" press="onSimulation"></core:Icon> -->
 									</HBox>
 									<HBox justifyContent="Center">
-										<Image src="images/BMW_logo.png" height="50px" width="50px"></Image>
+										<Image src="images/BMW_logo.png" height="50px" width="50px" press="action"
+											xmlns:action="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+											action:wiring="\{'press':\{'navigation':\{'routeName':'View2'\}\}\}"/>
 									</HBox>
 									<HBox id="HBoxIdBatteryPower" justifyContent="Center">
-										<core:Icon id="IconBatteryPower" src="sap-icon://crossed-line-chart" size="1cm" color="#FF0000" visible="{TableRow1>visibleBatteryPower}"></core:Icon>
+										<core:Icon id="IconBatteryPower" src="sap-icon://crossed-line-chart" size="1cm" color="#FF0000" visible="{TableRow1>visibleBatteryPower}"/>
 									</HBox>
 									<HBox id="HBoxIdOilTemp" justifyContent="Center">
-										<core:Icon id="IconOilTemp" src="sap-icon://temperature" size="1cm" color="#FF0000" visible="{TableRow1>visibleOilTemp}"></core:Icon>
+										<core:Icon id="IconOilTemp" src="sap-icon://temperature" size="1cm" color="#FF0000" visible="{TableRow1>visibleOilTemp}"/>
 									</HBox>
 									<HBox id="HBoxIdWaterTemp" justifyContent="Center">
-										<core:Icon id="IconWaterTemp" src="sap-icon://heating-cooling" size="1cm" color="#FF0000" visible="{TableRow1>visibleWaterTemp}"></core:Icon>
+										<core:Icon id="IconWaterTemp" src="sap-icon://heating-cooling" size="1cm" color="#FF0000" visible="{TableRow1>visibleWaterTemp}"/>
 									</HBox>
 									<HBox id="HBoxIdIndicatorRight" justifyContent="End">
 										<core:Icon id="IconIndicatorRight" src="sap-icon://open-command-field" size="1cm" color="#FF8C00"
-											visible="{TableRow1>visibleIndicatorRight}"></core:Icon>
+											visible="{TableRow1>visibleIndicatorRight}"/>
 									</HBox>
 								</cells>
 							</ColumnListItem>
@@ -54,8 +56,8 @@
 					</Table>
 					<Table id="idTableRow2" items="{path: 'TableRow2>/results'}">
 						<columns>
-							<Column width="85%"></Column>
-							<Column width="15%"></Column>
+							<Column width="85%"/>
+							<Column width="15%"/>
 						</columns>
 						<items>
 							<ColumnListItem vAlign="Middle">
@@ -63,7 +65,7 @@
 									<ProgressIndicator percentValue="{TableRow2>rpmPercentValue}" displayValue="{TableRow2>rpmDisplayValue}" showValue="true"
 										state="{TableRow2>rpmState}"/>
 									<HBox justifyContent="End">
-										<Text id="idTextGear" text="{TableRow2>gearValue}" class="customMTextGear customMTextColorYellowGear"/>
+										<Text id="idTextGear" text="{TableRow2>gearValue}" class="customMTextGear"/>
 										<Text text="Gear"/>
 									</HBox>
 								</cells>
@@ -72,9 +74,9 @@
 					</Table>
 					<Table id="idTableRow3" items="{path: 'TableRow3>/results'}">
 						<columns>
-							<Column width="10%"></Column>
-							<Column width="auto"></Column>
-							<Column width="45%"></Column>
+							<Column width="10%"/>
+							<Column width="auto"/>
+							<Column width="45%"/>
 						</columns>
 						<items>
 							<ColumnListItem vAlign="Middle">
@@ -90,24 +92,35 @@
 											</si:propertyThresholds>
 										</si:StatusIndicator>
 										<HBox id="HBoxIdFuel" justifyContent="Start">
-											<core:Icon id="IconFuel" src="sap-icon://mileage" size="1cm" color="#4682B4"></core:Icon>
+											<core:Icon id="IconFuel" src="sap-icon://mileage" size="1cm" color="#4682B4"/>
 										</HBox>
 									</VBox>
 									<HBox>
-										<Table id="idTableRow3Info" items="{path: 'TableInfo>/results'}" backgroundDesign="Solid">
+										<Table id="idTableRow3Info1" items="{path: 'TableRow3>info1', templateShareable:false}" itemPress="onItemPressTableInfo">
 											<columns>
-												<Column width="50%"></Column>
-												<Column width="50%"></Column>
+												<Column width="55%"/>
+												<Column width="45%"/>
 											</columns>
 											<items>
-												<ColumnListItem vAlign="Middle">
+												<ColumnListItem vAlign="Middle" type="Active">
 													<cells>
-														<ComboBox items="{ path: 'ComboBoxInfo>/results'}" width="100%">
-															<core:Item key="{ComboBoxInfo>key}" text="{ComboBoxInfo>text}"/>
-														</ComboBox>
-														<ComboBox items="{ path: 'ComboBoxInfo>/results'}" width="100%">
-															<core:Item key="{ComboBoxInfo>key}" text="{ComboBoxInfo>text}"/>
-														</ComboBox>
+														<Label id="idLabelTableInfo1" text="{TableRow3>label}"></Label>
+														<Text id="idTextTableInfo1" text="{TableRow3>text}"></Text>
+													</cells>
+												</ColumnListItem>
+											</items>
+										</Table>
+										<Table id="idTableRow3Info2" items="{path: 'TableRow3>info2', templateShareable:false}" itemPress="onItemPressTableInfo">
+											<columns>
+												<Column width="55%"/>
+												<Column width="45%"/>
+											</columns>
+											<items>
+												<ColumnListItem vAlign="Middle" type="Active">
+													<cells>
+														<Label id="idLabelTableInfo2" text="{TableRow3>label}"></Label>
+														<Text id="idTextTableInfo2" text="{TableRow3>text}"></Text>
+
 													</cells>
 												</ColumnListItem>
 											</items>

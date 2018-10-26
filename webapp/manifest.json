@@ -14,7 +14,6 @@
 			"version": "1.40.12"
 		}
 	},
-
 	"sap.ui": {
 		"technology": "UI5",
 		"icons": {
@@ -72,15 +71,24 @@
 				"controlId": "idAppControl"
 			},
 			"routes": [{
-				"name": "TargetView1",
-				"pattern": "RouteView1",
-				"target": ["TargetView1"]
+				"name": "View2",
+				"pattern": "View2",
+				"target": ["View2"]
+			}, {
+				"name": "View1",
+				"pattern": "View1",
+				"target": ["View1"]
 			}],
 			"targets": {
-				"TargetView1": {
+				"View2": {
+					"viewType": "XML",
+					"viewName": "View2",
+					"transition": "slide"
+				},
+				"View1": {
 					"viewType": "XML",
 					"transition": "slide",
-					"clearAggregation": true,
+					"clearControlAggregation": false,
 					"viewName": "View1"
 				}
 			}

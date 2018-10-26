@@ -17,6 +17,8 @@ sap.ui.define([
 		 * @override
 		 */
 		init: function() {
+			jQuery.sap.require("jquery.sap.storage");
+
 			// call the base component's init function
 			UIComponent.prototype.init.apply(this, arguments);
 

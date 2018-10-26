@@ -1,0 +1,6 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<SelectDialog id="DialogTableInfo" noDataText="No items found" title="Select item" confirm="onDialogClose" cancel="onDialogClose"
+		items="{path: '/results'}">
+		<StandardListItem title="{title}" type="Active"/>
+	</SelectDialog>
+</core:FragmentDefinition>

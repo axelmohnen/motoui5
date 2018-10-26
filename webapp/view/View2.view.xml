@@ -1,0 +1,36 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:html="http://www.w3.org/1999/xhtml" controllerName="motoui5.motoui5.controller.View2">
+	<App>
+		<pages>
+			<Page xmlns:action="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" title="Moto - Setup" showNavButton="true" navButtonPress="action" action:wiring="\{'navButtonPress':\{'navigation':\{'routeName':'View1'\}\}\}">
+				<content>
+					<sap.ui.layout.form:SimpleForm xmlns:sap.ui.layout.form="sap.ui.layout.form" editable="true" layout="ResponsiveGridLayout" id="MotoSetupForm">
+						<sap.ui.layout.form:content>
+							<Label id="LabelKmTotal" text="KM Total"/>
+							<Input id="InputKmTotal" width="100%" value="{motoSetup>/KmTotal}"/>
+							<Label id="LabelTrip1" text="Trip1"/>
+							<Input id="InputTrip1" width="100%" value="{motoSetup>/Trip1}"/>
+							<Button id="ButtonTrip1" text="Reset" press="onResetTrip1"/>
+							<Label id="LabelTrip2" text="Trip2"/>
+							<Input id="InputTrip2" width="100%" value="{motoSetup>/Trip2}"/>
+							<Button id="ButtonTrip2" text="Reset" press="onResetTrip2"/>
+							<Label id="LabelKmOffset" text="KM Offset"/>
+							<Input id="InputKmOffset" width="100%" value="{motoSetup>/KmOffset}"/>
+							<Label id="LabelSpeedOffset" text="Speed Offset"/>
+							<Input id="InputSpeedOffset" width="100%" value="{motoSetup>/SpeedOffset}"/>
+							<Label id="LabelRpmOffset" text="RPM Offset"/>
+							<Input id="InputRpmOffset" width="100%" value="{motoSetup>/RpmOffset}"/>
+						</sap.ui.layout.form:content>
+					</sap.ui.layout.form:SimpleForm>
+				</content>
+			<footer>
+			    <Toolbar class="sapContrast sapContrastPlus" width="100%" id="ToolbarMotoSetup">
+			        <content>
+			        	<ToolbarSpacer/>
+			        	<Button text="Save" width="100px" id="ButtonMotoSetupSave" press="onSavePress"/>
+			        </content>
+			    </Toolbar>
+			</footer>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
