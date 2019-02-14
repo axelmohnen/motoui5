@@ -1,15 +1,15 @@
 /* global evothings:true */
 /* global Uint8Array */
-/* global DataView */
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel",
 	"motoui5/motoui5/libs/evothings/evothings",
 	"sap/m/MessageToast",
-	'sap/ui/model/Filter'
+	"sap/ui/model/Filter"
 ], function (Controller, JSONModel, evothingsjs, MessageToast, Filter) {
 	"use strict";
 	var ble = null;
+	var that = null;
 	var sInfoV1 = "KM Total";
 	var sInfoV2 = "Trip 1";
 	var sInfoV3 = "Trip 2";
@@ -27,6 +27,17 @@ sap.ui.define([
 
 	return Controller.extend("motoui5.motoui5.controller.View1", {
 		onInit: function () {
+			
+			that = this;
+			// Init logger
+			var aLogger = [];
+			var oModelLogger = this.getOwnerComponent().getModel("logger");
+			oModelLogger.setData(aLogger);
+
+			// document.addEventListener("deviceready", function () {
+			// 	evothings.scriptsLoaded(that.onDeviceReady);
+			// }, false);
+
 			// Discovered devices.
 			this.knownDevices = {};
 			// Reference to the device we are connecting to.
@@ -38,9 +49,7 @@ sap.ui.define([
 			this.characteristicRead = null;
 			this.characteristicWrite = null;
 			this.descriptorNotification = null;
-			document.addEventListener("deviceready", function () {
-				evothings.scriptsLoaded(this.onDeviceReady);
-			}, false);
+
 			this.iRpmMax = 6000;
 			this.iRpmLimit = 5000;
 			this.iKmLast = 0;
@@ -87,8 +96,8 @@ sap.ui.define([
 			oTableRowList3.results[0] = {
 				fuelValue: "0",
 				speedValue: "0",
-				info1: [],
-				info2: []
+				info1: []
+					//info2: []
 			};
 
 			// Set InfoList
@@ -139,6 +148,12 @@ sap.ui.define([
 			//Build Info list table
 			this.updateTableInfoList();
 
+			//Initialization process is done, run startup
+			this.onStartUp();
+
+			//Perform BLE connection
+			this.onDeviceReady();
+
 		},
 
 		onBeforeRendering: function () {},
@@ -150,33 +165,35 @@ sap.ui.define([
 			var aTableRow3Cells = aTableRow3Items[0].getCells();
 			var aTableRow3InfoItems = aTableRow3Cells[1].getItems();
 			var oTableInfo1 = aTableRow3InfoItems[0];
-			var oTableInfo2 = aTableRow3InfoItems[1];
+			//var oTableInfo2 = aTableRow3InfoItems[1];
 			var aInfoItems1 = oTableInfo1.getItems();
-			var aInfoItems2 = oTableInfo2.getItems();
+			//var aInfoItems2 = oTableInfo2.getItems();
 
 			aInfoItems1[0].addStyleClass("customMLIBShowSeparatorFirst");
-			aInfoItems2[0].addStyleClass("customMLIBShowSeparatorFirst");
-
-			//Initialization process is done, run startup
-			this.onStartUp();
+			//aInfoItems2[0].addStyleClass("customMLIBShowSeparatorFirst");
 		},
-		
+
+		setLog: function (sType, sMessage) {
+			// Get logger model
+			var oModelLogger = this.getOwnerComponent().getModel("logger");
+			// Get actual logs
+			var aLogger = oModelLogger.getData();
+			
+			// Build message object
+			var oMessage = {
+				type: sType,
+				title: sMessage
+			};
+
+			//Add new message to log
+			aLogger.push(oMessage);
+			oModelLogger.setData(aLogger);
+		},
+
 		onDeviceReady: function () {
 			ble = evothings.ble;
 			// Evothings BLE plugin
 			this.startScan();
-			evothings.arduinoble.close();
-			evothings.arduinoble.connect(
-				"HMSOFT", // Name of the module.
-				function (device) {
-					this.device = device;
-					//Initialization process is done, run startup
-					this.onStartUp();
-				},
-				function (errorCode) {
-					//Initialization process ended with errors, send message
-					MessageToast.show("Connect error: " + errorCode);
-				});
 		},
 
 		getMotoData: function () {
@@ -250,7 +267,7 @@ sap.ui.define([
 
 			//Build new info list
 			var aInfo1 = new Array(3);
-			var aInfo2 = new Array(3);
+			//var aInfo2 = new Array(3);
 			for (var i = 0; i < oMotoData.Info.length; i++) {
 				for (var j = 0; j < aInfoList.length; j++) {
 					oInfoList = aInfoList[j];
@@ -264,13 +281,16 @@ sap.ui.define([
 							text: value
 						};
 
-						if (iInfoCounter < 3) {
-							// Push object to info array 1
-							aInfo1[iInfoCounter] = oInfo;
-						} else if (iInfoCounter < 6) {
-							// Push object to info array 2
-							aInfo2[iInfoCounter - 3] = oInfo;
-						}
+						// Push object to info array 1
+						aInfo1[iInfoCounter] = oInfo;
+
+						// if (iInfoCounter < 3) {
+						// 	// Push object to info array 1
+						// 	aInfo1[iInfoCounter] = oInfo;
+						// } else if (iInfoCounter < 6) {
+						// 	// Push object to info array 2
+						// 	aInfo2[iInfoCounter - 3] = oInfo;
+						// }
 
 						//Increment counter
 						iInfoCounter += 1;
@@ -283,7 +303,7 @@ sap.ui.define([
 
 			//Update Info list model
 			oTableRow3Model.setProperty("/results/0/info1", aInfo1);
-			oTableRow3Model.setProperty("/results/0/info2", aInfo2);
+			//oTableRow3Model.setProperty("/results/0/info2", aInfo2);
 		},
 
 		onItemPressTableInfo: function (oEvent) {
@@ -310,8 +330,8 @@ sap.ui.define([
 			var oSelectedData;
 
 			if (aContexts && aContexts.length) {
-				if (aContexts.length > 6) {
-					MessageToast.show("max 6 items!");
+				if (aContexts.length > 3) {
+					MessageToast.show("max 3 items!");
 					this.onItemPressTableInfo();
 					return;
 				}
@@ -352,80 +372,83 @@ sap.ui.define([
 		},
 
 		startScan: function () {
+			//Start BLE scanning
 			evothings.ble.startScan(function (deviceInfo) {
-				if (this.knownDevices[deviceInfo.address]) {
+				if (that.knownDevices[deviceInfo.address]) {
 					return;
 				}
-				MessageToast.show("found device: " + deviceInfo.name);
-				this.knownDevices[deviceInfo.address] = deviceInfo;
-				if (deviceInfo.name === "HMSOFT" && !this.connectee) {
-					MessageToast.show("Found HMSOFT");
-					this.connectee = deviceInfo;
-					this.connect(deviceInfo.address);
+				that.setLog("Information", "found device: " + deviceInfo.name);
+				that.knownDevices[deviceInfo.address] = deviceInfo;
+				if (deviceInfo.name === "HMSoft" && !that.connectee) {
+					that.setLog("Information", "Found HMSOFT");
+					that.connectee = deviceInfo;
+					that.connect(deviceInfo.address);
 				}
 			}, function (errorCode) {
-				MessageToast.show("startScan error: " + errorCode);
+				that.setLog("Error", "startScan error: " + errorCode);
 			});
 		},
 		connect: function (address) {
 			evothings.ble.stopScan();
-			MessageToast.show("Connecting...");
+			that.setLog("Information", "Connecting...");
 			evothings.ble.connect(address, function (connectInfo) {
 				if (connectInfo.state === 2)
 				// Connected
 				{
-					this.deviceHandle = connectInfo.deviceHandle;
-					this.getServices(connectInfo.deviceHandle);
+					that.setLog("Information", "Connected");
+					that.deviceHandle = connectInfo.deviceHandle;
+					that.getServices(connectInfo.deviceHandle);
 				} else {
-					MessageToast.show("Disconnected");
+					that.setLog("Error", "Disconnected");
 				}
 			}, function (errorCode) {
-				MessageToast.show("connect error: " + errorCode);
+				that.setLog("Error", "connect error: " + errorCode);
 			});
 		},
 		getServices: function (deviceHandle) {
-			MessageToast.show("Reading services...");
+			that.setLog("Information", "Reading services...");
 			evothings.ble.readAllServiceData(deviceHandle, function (services) {
 				// Find handles for characteristics and descriptor needed.
 				for (var si in services) {
 					var service = services[si];
 					for (var ci in service.characteristics) {
 						var characteristic = service.characteristics[ci];
-						if (characteristic.uuid === "713d0002-503e-4c75-ba94-3148f18d941e") {
-							this.characteristicRead = characteristic.handle;
-						} else if (characteristic.uuid === "713d0003-503e-4c75-ba94-3148f18d941e") {
-							this.characteristicWrite = characteristic.handle;
+						if (characteristic.uuid === "0000ffe1-0000-1000-8000-00805f9b34fb") {
+							that.characteristicRead = characteristic.handle;
+						}
+						if (characteristic.uuid === "0000ffe1-0000-1000-8000-00805f9b34fb") {
+							that.characteristicWrite = characteristic.handle;
 						}
 						for (var di in characteristic.descriptors) {
 							var descriptor = characteristic.descriptors[di];
-							if (characteristic.uuid === "713d0002-503e-4c75-ba94-3148f18d941e" && descriptor.uuid ===
+							if (characteristic.uuid === "0000ffe1-0000-1000-8000-00805f9b34fb" && descriptor.uuid ===
 								"00002902-0000-1000-8000-00805f9b34fb") {
-								this.descriptorNotification = descriptor.handle;
+								that.descriptorNotification = descriptor.handle;
 							}
 						}
 					}
 				}
-				if (this.characteristicRead && this.characteristicWrite && this.descriptorNotification) {
-					MessageToast.show("RX/TX services found");
+				if (that.characteristicRead && that.characteristicWrite && that.descriptorNotification) {
+					that.setLog("Information", "RX/TX services found");
 					this.startReading(deviceHandle);
 				} else {
-					MessageToast.show("ERROR: RX/TX services not found!");
+					that.setLog("Error", "ERROR: RX/TX services not found!");
 				}
 			}, function (errorCode) {
-				MessageToast.show("readAllServiceData error: " + errorCode);
+				that.setLog("Error", "readAllServiceData error: " + errorCode);
 			});
 		},
 		write: function (writeFunc, deviceHandle, handle, value) {
 			if (handle) {
 				ble[writeFunc](deviceHandle, handle, value, function () {
-					MessageToast.show(writeFunc + ": " + handle + " success.");
+					that.setLog("Information", writeFunc + ": " + handle + " success.");
 				}, function (errorCode) {
-					MessageToast.show(writeFunc + ": " + handle + " error: " + errorCode);
+					that.setLog("Error", writeFunc + ": " + handle + " error: " + errorCode);
 				});
 			}
 		},
 		startReading: function (deviceHandle) {
-			MessageToast.show("Enabling notifications...");
+			that.setLog("Information", "Enabling notifications...");
 			// Turn notifications on.
 			this.write("writeDescriptor", deviceHandle, this.descriptorNotification, new Uint8Array([
 				1,
@@ -433,26 +456,21 @@ sap.ui.define([
 			]));
 			// Start reading notifications.
 			evothings.ble.enableNotification(deviceHandle, this.characteristicRead, function (data) {
-				MessageToast.show("Active");
-				//var aData = new DataView(data).getUint16(0, true);
+				//Retrieve sensor data via BLE
 				var sSensorData = String.fromCharCode.apply(null, new Uint8Array(data));
 				//Update moto infos
 				this.update(sSensorData);
 
 			}, function (errorCode) {
-				MessageToast.show("enableNotification error: " + errorCode);
+				that.setLog("Error", "enableNotification error: " + errorCode);
 			});
 		},
-		
-		onStartUp: function(){
-		
-		//Show error message
-		MessageToast.show("Ready to cruise?");
-				
-		//On Start-up - switch all lights on
-		var sSensorData = this.iRpmMax + ";200;1;1;1;1;1;1;1;0;100;0";
-		
-		//Update dashboard information
+
+		onStartUp: function () {
+			//On Start-up - switch all lights on
+			var sSensorData = this.iRpmMax + ";200;1;1;1;1;1;1;1;0;100;0";
+
+			//Update dashboard information
 			this.update(sSensorData);
 		},
 
@@ -472,7 +490,7 @@ sap.ui.define([
 		// 	this.iKm += Math.floor(Math.random() * 5);
 		// 	var sSensorData = sRpm + ";" + sSpeed + ";" + sHighBeam + ";" + sBatteryPower + ";" + sOilTemp + ";" + sWaterTemp + ";" + sChoke +
 		// 		";" + sIndicatorLeft + ";" + sIndicatorRight + ";" + sGear + ";" + sFuel + ";" + this.iKm;
-			
+
 		// 	//Update dashboard information
 		// 	this.update(sSensorData);
 
@@ -496,40 +514,50 @@ sap.ui.define([
 			this.setFuel(aSensordata[10]);
 			this.setInfo(aSensordata[11]);
 		},
-		
-		setInfo: function(sValue){
+
+		setInfo: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			// Get moto offline data
 			var oMotoData = this.getMotoData();
 			var iKm = parseInt(sValue, 10);
-			
+
 			var iKmDiff = iKm - this.iKmLast;
 			//Update Kilometer counter
 			oMotoData.KmTotal += iKmDiff;
 			oMotoData.Trip1 += iKmDiff;
 			oMotoData.Trip2 += iKmDiff;
-			
+
 			//Update last KM counter
 			this.iKmLast = iKm;
-			
+
 			//Update moto offline data
 			this.setMotoData(oMotoData);
-			
+
 			//Build Info list table
 			this.updateTableInfoList();
 		},
 
 		setRpm: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			// Get Table row model
 			var oTableRow2 = this.getView().getModel("TableRow2");
 			var iRpm = parseInt(sValue, 10);
-			
+
 			// Get moto offline data
 			var oMotoData = this.getMotoData();
-			
+
 			//Calculate RPM with offset 
 			iRpm += oMotoData.RpmOffset;
 			iRpm = parseInt(iRpm, 10);
-			
+
 			// Calculate RPM percentage
 			var iRpmPercent = iRpm / this.iRpmMax * 100;
 			// Set RPM state
@@ -546,35 +574,48 @@ sap.ui.define([
 		},
 
 		setSpeed: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			// Get Table row model
 			var oTableRow3 = this.getView().getModel("TableRow3");
 			var iSpeed = parseInt(sValue, 10);
-			
+
 			// Get moto offline data
 			var oMotoData = this.getMotoData();
-			
+
 			//Calculate Speed with offset 
 			iSpeed += oMotoData.SpeedOffset;
 			iSpeed = parseInt(iSpeed, 10);
-			
+
 			// Set values to model
 			oTableRow3.setProperty("/results/0/speedValue", iSpeed);
 		},
 
 		setGear: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			// Get Table row model
 			var oTableRow2 = this.getView().getModel("TableRow2");
+			var iValue = parseInt(sValue, 10);
 			var sGear = "";
 			// Get text control object
 			var oTextControl = this.getView().byId("idTextGear");
 			if (oTextControl) {
 				//Set Gear Text color
-				if (sValue === "0") {
+				if (sValue === 0) {
 					//Set Gear text
 					sGear = "N";
-				} else {
+				} else if (sValue >= 1 && sValue <= 5) {
 					//Set Gear text
-					sGear = sValue;
+					sGear = iValue;
+				} else {
+					return;
 				}
 			}
 			// Set values to model
@@ -582,6 +623,11 @@ sap.ui.define([
 		},
 
 		setFuel: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			// Get Table row model
 			var oTableRow3 = this.getView().getModel("TableRow3");
 			// Set values to model
@@ -589,15 +635,25 @@ sap.ui.define([
 		},
 
 		setHighBeam: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data 
@@ -605,15 +661,25 @@ sap.ui.define([
 		},
 
 		setBatteryPower: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data 
@@ -621,15 +687,25 @@ sap.ui.define([
 		},
 
 		setWaterTemp: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data 
@@ -637,15 +713,25 @@ sap.ui.define([
 		},
 
 		setOilTemp: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data 
@@ -653,15 +739,25 @@ sap.ui.define([
 		},
 
 		setChoke: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data 
@@ -669,15 +765,25 @@ sap.ui.define([
 		},
 
 		setIndicatorLeft: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data 
@@ -685,15 +791,25 @@ sap.ui.define([
 		},
 
 		setIndicatorRight: function (sValue) {
+			//Only numeric value allowed
+			if (isNaN(sValue)) {
+				return;
+			}
+
 			var bVisible;
 			//Get Model
 			var oTableRow1 = this.getView().getModel("TableRow1");
 
-			//Step visibility
-			if (sValue === "0") {
+			//Set visibility
+			switch (sValue) {
+			case "0":
 				bVisible = false;
-			} else {
+				break;
+			case "1":
 				bVisible = true;
+				break;
+			default:
+				return;
 			}
 
 			//Update model data
@@ -701,7 +817,6 @@ sap.ui.define([
 		},
 
 		action: function (oEvent) {
-			var that = this;
 			var actionParameters = JSON.parse(oEvent.getSource().data("wiring").replace(/'/g, "\""));
 			var eventType = oEvent.getId();
 			var aTargets = actionParameters[eventType].targets || [];

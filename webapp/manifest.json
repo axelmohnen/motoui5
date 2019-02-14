@@ -54,6 +54,11 @@
 				"settings": {
 					"bundleName": "motoui5.motoui5.i18n.i18n"
 				}
+			},
+			"logger": {
+				"type": "sap.ui.model.json.JSONModel",
+				"settings": {},
+				"preload": false
 			}
 		},
 		"resources": {

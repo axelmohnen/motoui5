@@ -110,21 +110,21 @@
 												</ColumnListItem>
 											</items>
 										</Table>
-										<Table id="idTableRow3Info2" items="{path: 'TableRow3>info2', templateShareable:false}" itemPress="onItemPressTableInfo">
-											<columns>
-												<Column width="55%"/>
-												<Column width="45%"/>
-											</columns>
-											<items>
-												<ColumnListItem vAlign="Middle" type="Active">
-													<cells>
-														<Label id="idLabelTableInfo2" text="{TableRow3>label}"></Label>
-														<Text id="idTextTableInfo2" text="{TableRow3>text}"></Text>
+										<!--<Table id="idTableRow3Info2" items="{path: 'TableRow3>info2', templateShareable:false}" itemPress="onItemPressTableInfo">-->
+										<!--	<columns>-->
+										<!--		<Column width="55%"/>-->
+										<!--		<Column width="45%"/>-->
+										<!--	</columns>-->
+										<!--	<items>-->
+										<!--		<ColumnListItem vAlign="Middle" type="Active">-->
+										<!--			<cells>-->
+										<!--				<Label id="idLabelTableInfo2" text="{TableRow3>label}"></Label>-->
+										<!--				<Text id="idTextTableInfo2" text="{TableRow3>text}"></Text>-->
 
-													</cells>
-												</ColumnListItem>
-											</items>
-										</Table>
+										<!--			</cells>-->
+										<!--		</ColumnListItem>-->
+										<!--	</items>-->
+										<!--</Table>-->
 									</HBox>
 									<HBox justifyContent="End">
 										<Text text="{TableRow3>speedValue}" class="customMTextSpeed"/>

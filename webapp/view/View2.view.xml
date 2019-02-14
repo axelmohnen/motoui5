@@ -26,7 +26,8 @@
 			    <Toolbar class="sapContrast sapContrastPlus" width="100%" id="ToolbarMotoSetup">
 			        <content>
 			        	<ToolbarSpacer/>
-			        	<Button text="Save" width="100px" id="ButtonMotoSetupSave" press="onSavePress"/>
+			        	<Button xmlns="sap.m" text="Logs" id="ButtonMotoLogger" icon="sap-icon://list" press="onDisplayLogs"/>
+			        	<Button text="Save" width="100px" id="ButtonMotoSetupSave" press="onSavePress" icon="sap-icon://save"/>
 			        </content>
 			    </Toolbar>
 			</footer>
