@@ -27,16 +27,12 @@ sap.ui.define([
 
 	return Controller.extend("motoui5.motoui5.controller.View1", {
 		onInit: function () {
-			
+
 			that = this;
 			// Init logger
 			var aLogger = [];
 			var oModelLogger = this.getOwnerComponent().getModel("logger");
 			oModelLogger.setData(aLogger);
-
-			// document.addEventListener("deviceready", function () {
-			// 	evothings.scriptsLoaded(that.onDeviceReady);
-			// }, false);
 
 			// Discovered devices.
 			this.knownDevices = {};
@@ -49,6 +45,8 @@ sap.ui.define([
 			this.characteristicRead = null;
 			this.characteristicWrite = null;
 			this.descriptorNotification = null;
+			this.sSerialData = "";
+			this.retry = 10;
 
 			this.iRpmMax = 6000;
 			this.iRpmLimit = 5000;
@@ -178,7 +176,7 @@ sap.ui.define([
 			var oModelLogger = this.getOwnerComponent().getModel("logger");
 			// Get actual logs
 			var aLogger = oModelLogger.getData();
-			
+
 			// Build message object
 			var oMessage = {
 				type: sType,
@@ -380,7 +378,7 @@ sap.ui.define([
 				that.setLog("Information", "found device: " + deviceInfo.name);
 				that.knownDevices[deviceInfo.address] = deviceInfo;
 				if (deviceInfo.name === "HMSoft" && !that.connectee) {
-					that.setLog("Information", "Found HMSOFT");
+					that.setLog("Information", "Found HMSoft");
 					that.connectee = deviceInfo;
 					that.connect(deviceInfo.address);
 				}
@@ -400,6 +398,12 @@ sap.ui.define([
 					that.getServices(connectInfo.deviceHandle);
 				} else {
 					that.setLog("Error", "Disconnected");
+					if (that.retry > 0){
+						//Decrement retry counter
+						that.retry -= 1;
+						//Retry BLE connection
+						that.onDeviceReady();
+					}
 				}
 			}, function (errorCode) {
 				that.setLog("Error", "connect error: " + errorCode);
@@ -430,7 +434,7 @@ sap.ui.define([
 				}
 				if (that.characteristicRead && that.characteristicWrite && that.descriptorNotification) {
 					that.setLog("Information", "RX/TX services found");
-					this.startReading(deviceHandle);
+					that.startReading(deviceHandle);
 				} else {
 					that.setLog("Error", "ERROR: RX/TX services not found!");
 				}
@@ -448,7 +452,7 @@ sap.ui.define([
 			}
 		},
 		startReading: function (deviceHandle) {
-			that.setLog("Information", "Enabling notifications...");
+			this.setLog("Information", "Enabling notifications...");
 			// Turn notifications on.
 			this.write("writeDescriptor", deviceHandle, this.descriptorNotification, new Uint8Array([
 				1,
@@ -457,13 +461,45 @@ sap.ui.define([
 			// Start reading notifications.
 			evothings.ble.enableNotification(deviceHandle, this.characteristicRead, function (data) {
 				//Retrieve sensor data via BLE
-				var sSensorData = String.fromCharCode.apply(null, new Uint8Array(data));
-				//Update moto infos
-				this.update(sSensorData);
+				var sSerialData = String.fromCharCode.apply(null, new Uint8Array(data));
+				var sSensorData = that.deserialize(sSerialData);
+
+				if (sSensorData) {
+					//Update moto infos
+					that.update(sSensorData);
+				}
 
 			}, function (errorCode) {
 				that.setLog("Error", "enableNotification error: " + errorCode);
 			});
+		},
+
+		deserialize: function (sSerialData) {
+			//Set serial data string
+			this.sSerialData += sSerialData;
+
+			//Search for line start character
+			var iLineStartPos = this.sSerialData.search("<");
+			if (iLineStartPos === -1) {
+				return;
+			} else {
+				//Keep the remaining serial data string
+				this.sSerialData = this.sSerialData.substring(iLineStartPos);
+			}
+
+			//Search for line end character
+			var iLineEndPos = this.sSerialData.search(">");
+			if (iLineEndPos === -1) {
+				return;
+			}
+
+			//Get sensor data by offset
+			var sSensorData = this.sSerialData.substring(1, iLineEndPos);
+
+			//Keep the remaining serial data string
+			this.sSerialData = this.sSerialData.substring((iLineEndPos + 1));
+			return sSensorData;
+
 		},
 
 		onStartUp: function () {
@@ -608,10 +644,10 @@ sap.ui.define([
 			var oTextControl = this.getView().byId("idTextGear");
 			if (oTextControl) {
 				//Set Gear Text color
-				if (sValue === 0) {
+				if (iValue === 0) {
 					//Set Gear text
 					sGear = "N";
-				} else if (sValue >= 1 && sValue <= 5) {
+				} else if (iValue >= 1 && iValue <= 5) {
 					//Set Gear text
 					sGear = iValue;
 				} else {
