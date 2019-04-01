@@ -14,16 +14,18 @@ sap.ui.define([
 	var sInfoV2 = "Trip 1";
 	var sInfoV3 = "Trip 2";
 	var sInfoV4 = "Tilt angle";
-	var sInfoV5 = "GPS Speed";
-	var sInfoV6 = "GPS Pos";
-	var sInfoV7 = "Altimet";
+	var sInfoV5 = "Speed";
+	var sInfoV6 = "Lat.";
+	var sInfoV7 = "Lon.";
+	var sInfoV8 = "Alt.";
 	var sInfoK1 = "KmTotal";
 	var sInfoK2 = "Trip1";
 	var sInfoK3 = "Trip2";
 	var sInfoK4 = "TiltAngle";
-	var sInfoK5 = "GpsSpeed";
-	var sInfoK6 = "GpsPosition";
-	var sInfoK7 = "Altimeter";
+	var sInfoK5 = "Speed";
+	var sInfoK6 = "Lat";
+	var sInfoK7 = "Lon";
+	var sInfoK8 = "Alt";
 
 	return Controller.extend("motoui5.motoui5.controller.View1", {
 		onInit: function () {
@@ -34,24 +36,23 @@ sap.ui.define([
 			var oModelLogger = this.getOwnerComponent().getModel("logger");
 			oModelLogger.setData(aLogger);
 
-			// Discovered devices.
-			this.knownDevices = {};
-			// Reference to the device we are connecting to.
-			this.connectee = null;
-			// Handle to the connected device.
-			this.deviceHandle = null;
-			// Handles to characteristics and descriptor for reading and
-			// writing data from/to the Arduino using the BLE shield.
-			this.characteristicRead = null;
-			this.characteristicWrite = null;
-			this.descriptorNotification = null;
-			this.sSerialData = "";
+			//Init BLE connetion data
+			this.initConnectData();
 			this.retry = 10;
 
+			//Set constants
 			this.iRpmMax = 6000;
 			this.iRpmLimit = 5000;
 			this.iKmLast = 0;
 			this.iKm = 0;
+
+			//Set geo data 
+			var sGeoSpeed = "";
+			var sGeoLat = "";
+			var sGeoLon = "";
+			var sGeoAlt = "";
+			var sAngle = "";
+
 			//Models for Table rows of moto dashboard
 			var oTableRow1 = new JSONModel();
 			var oTableRow2 = new JSONModel();
@@ -134,6 +135,11 @@ sap.ui.define([
 				title: sInfoV7,
 				method: "getOnlineData"
 			};
+			oInfoList.results[7] = {
+				id: sInfoK8,
+				title: sInfoV8,
+				method: "getOnlineData"
+			};
 
 			oTableRow1.setData(oTableRowList1);
 			oTableRow2.setData(oTableRowList2);
@@ -150,8 +156,37 @@ sap.ui.define([
 			this.onStartUp();
 
 			//Perform BLE connection
-			this.onDeviceReady();
+			//this.onDeviceReady();
 
+			//Init Geolocation API
+			this.initGeo();
+
+		},
+
+		initConnectData: function () {
+			// Discovered devices.
+			this.knownDevices = {};
+			// Reference to the device we are connecting to.
+			this.connectee = null;
+			// Handle to the connected device.
+			this.deviceHandle = null;
+			// Handles to characteristics and descriptor for reading and
+			// writing data from/to the Arduino using the BLE shield.
+			this.characteristicRead = null;
+			this.characteristicWrite = null;
+			this.descriptorNotification = null;
+			this.sSerialData = "";
+		},
+
+		initGeo: function () {
+			navigator.geolocation.watchPosition(
+				this.onGeoSuccess,
+				this.onGeoFailure, {
+					enableHighAccuracy: true,
+					maximumAge: 30000,
+					timeout: 20000
+				}
+			);
 		},
 
 		onBeforeRendering: function () {},
@@ -169,6 +204,47 @@ sap.ui.define([
 
 			aInfoItems1[0].addStyleClass("customMLIBShowSeparatorFirst");
 			//aInfoItems2[0].addStyleClass("customMLIBShowSeparatorFirst");
+		},
+
+		onGeoSuccess: function (event) {
+			//Set Speed
+			if (event.coords.speed) {
+				that.sGeoSpeed = event.coords.speed.toString();
+			}
+
+			//Set Latitude
+			if (event.coords.latitude) {
+				that.sGeoLat = event.coords.latitude.toString();
+			}
+
+			//Set Longitude
+			if (event.coords.longitude) {
+				that.sGeoLon = event.coords.longitude.toString();
+			}
+
+			//Set Altitude
+			if (event.coords.altitude) {
+				that.sGeoAlt = event.coords.altitude.toString();
+			}
+
+			//Set Angle
+			var oOrientation = window.screen.orientation;
+			that.sGeoAngle = oOrientation.angle;
+
+			//Update info list
+			that.updateTableInfoList();
+		},
+
+		onGeoFailure: function (event) {
+			that.setLog("Error", "Geo Failure");
+			return 0;
+		},
+
+		handleRefresh: function (event) {
+			if (!that.connectee) {
+				//Retry BLE connection
+				this.onDeviceReady();
+			}
 		},
 
 		setLog: function (sType, sMessage) {
@@ -238,7 +314,33 @@ sap.ui.define([
 		},
 
 		getOnlineData: function (sId) {
-			return 0;
+			var sValue = "";
+			switch (sId) {
+			case sInfoK4:
+				sValue = this.sGeoAngle;
+				break;
+
+			case sInfoK5:
+				sValue = this.sGeoSpeed;
+				break;
+
+			case sInfoK6:
+				sValue = this.sGeoLat;
+				break;
+
+			case sInfoK7:
+				sValue = this.sGeoLon;
+				break;
+
+			case sInfoK8:
+				sValue = this.sGeoAlt;
+				break;
+
+			default:
+				return 0;
+			}
+			//Return value
+			return sValue;
 		},
 
 		updateTableInfoList: function () {
@@ -371,6 +473,8 @@ sap.ui.define([
 
 		startScan: function () {
 			//Start BLE scanning
+			this.initConnectData();
+			evothings.ble.stopScan();
 			evothings.ble.startScan(function (deviceInfo) {
 				if (that.knownDevices[deviceInfo.address]) {
 					return;
@@ -390,15 +494,14 @@ sap.ui.define([
 			evothings.ble.stopScan();
 			that.setLog("Information", "Connecting...");
 			evothings.ble.connect(address, function (connectInfo) {
-				if (connectInfo.state === 2)
-				// Connected
-				{
+				if (connectInfo.state === 2) {
+					// Connected
 					that.setLog("Information", "Connected");
 					that.deviceHandle = connectInfo.deviceHandle;
 					that.getServices(connectInfo.deviceHandle);
 				} else {
 					that.setLog("Error", "Disconnected");
-					if (that.retry > 0){
+					if (that.retry > 0) {
 						//Decrement retry counter
 						that.retry -= 1;
 						//Retry BLE connection

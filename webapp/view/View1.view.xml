@@ -5,6 +5,7 @@
 		<pages>
 			<Page title="{i18n>title}" showHeader="false">
 				<content>
+					<PullToRefresh id="IdPullToRefresh" refresh="handleRefresh"/>
 					<Table id="idTableRow1" items="{path: 'TableRow1>/results'}">
 						<columns>
 							<Column width="10%"/>
@@ -30,7 +31,7 @@
 										<core:Icon id="IconChoke" src="sap-icon://synchronize" size="1cm" color="#FF0000" visible="{TableRow1>visibleChoke}"/>
 									</HBox>
 									<HBox id="HBoxIdSimulation" justifyContent="Center">
-									<!--	<core:Icon id="IconSimulation" src="sap-icon://simulate" size="1cm" color="#FF8C00" press="onSimulation"></core:Icon> -->
+										<!--	<core:Icon id="IconSimulation" src="sap-icon://simulate" size="1cm" color="#FF8C00" press="onSimulation"></core:Icon> -->
 									</HBox>
 									<HBox justifyContent="Center">
 										<Image src="images/BMW_logo.png" height="50px" width="50px" press="action"
@@ -120,7 +121,6 @@
 										<!--			<cells>-->
 										<!--				<Label id="idLabelTableInfo2" text="{TableRow3>label}"></Label>-->
 										<!--				<Text id="idTextTableInfo2" text="{TableRow3>text}"></Text>-->
-
 										<!--			</cells>-->
 										<!--		</ColumnListItem>-->
 										<!--	</items>-->
