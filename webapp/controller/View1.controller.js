@@ -47,11 +47,11 @@ sap.ui.define([
 			this.iKm = 0;
 
 			//Set geo data 
-			var sGeoSpeed = "";
-			var sGeoLat = "";
-			var sGeoLon = "";
-			var sGeoAlt = "";
-			var sAngle = "";
+			this.sGeoSpeed = "0";
+			this.sGeoLat = "0";
+			this.sGeoLon = "0";
+			this.sGeoAlt = "0";
+			this.sAngle = "0";
 
 			//Models for Table rows of moto dashboard
 			var oTableRow1 = new JSONModel();
@@ -156,7 +156,7 @@ sap.ui.define([
 			this.onStartUp();
 
 			//Perform BLE connection
-			//this.onDeviceReady();
+			this.onDeviceReady();
 
 			//Init Geolocation API
 			this.initGeo();
@@ -183,8 +183,8 @@ sap.ui.define([
 				this.onGeoSuccess,
 				this.onGeoFailure, {
 					enableHighAccuracy: true,
-					maximumAge: 30000,
-					timeout: 20000
+					maximumAge: 0,
+					timeout: 5000
 				}
 			);
 		},
@@ -245,6 +245,8 @@ sap.ui.define([
 				//Retry BLE connection
 				this.onDeviceReady();
 			}
+			//Close busy indicator
+			this.getView().byId("IdPullToRefresh").hide();
 		},
 
 		setLog: function (sType, sMessage) {
