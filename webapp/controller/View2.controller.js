@@ -3,11 +3,17 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/m/MessagePopover",
-	"sap/m/MessageItem"
-], function (Controller, JSONModel, MessageToast, MessagePopover, MessageItem) {
+	"sap/m/MessageItem",
+	"sap/m/Dialog",
+	"sap/m/Button",
+	"sap/m/Text"
+], function (Controller, JSONModel, MessageToast, MessagePopover, MessageItem, Dialog, Button, Text) {
 	"use strict";
+	var that = null;
+	
 	return Controller.extend("motoui5.motoui5.controller.View2", {
 		onInit: function () {
+			that = this;
 			//Init Logger popup
 			var oMessageTemplate = new MessageItem({
 				type: "{type}",
@@ -22,10 +28,7 @@ sap.ui.define([
 				items: {
 					path: "/",
 					template: oMessageTemplate
-				},
-				// activeTitlePress: function () {
-				// 	MessageToast.show('Active title is pressed');
-				// }
+				}
 			});
 
 			//Set routing event handler
@@ -72,7 +75,6 @@ sap.ui.define([
 		 *@memberOf motoui5.motoui5.controller.View2
 		 */
 		action: function (oEvent) {
-			var that = this;
 			var actionParameters = JSON.parse(oEvent.getSource().data("wiring").replace(/'/g, "\""));
 			var eventType = oEvent.getId();
 			var aTargets = actionParameters[eventType].targets || [];
@@ -160,6 +162,36 @@ sap.ui.define([
 			//Show message
 			MessageToast.show("Data saved!");
 		},
+		
+		onClearPress: function (oEvent) {
+			//Build confirmation dialog	
+			var dialog = new Dialog({
+				title: "Confirm",
+				type: "Message",
+				content: new Text({ text: "Are you sure you want to delete web storage?" }),
+				beginButton: new Button({
+					text: "Yes",
+					press: function () {
+						//Clear offline Storage
+						that.oStorage.remove("moto");
+						dialog.close();
+					}
+				}),
+				endButton: new Button({
+					text: "No",
+					press: function () {
+						dialog.close();
+					}
+				}),
+				afterClose: function() {
+					dialog.destroy();
+				}
+			});
+
+			dialog.open();
+
+		},
+		
 		/**
 		 *@memberOf motoui5.motoui5.controller.View2
 		 */

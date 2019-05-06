@@ -19,6 +19,8 @@
 							<Input id="InputSpeedOffset" width="100%" value="{motoSetup>/SpeedOffset}"/>
 							<Label id="LabelRpmOffset" text="RPM Offset"/>
 							<Input id="InputRpmOffset" width="100%" value="{motoSetup>/RpmOffset}"/>
+							<Label text="Geo Data" width="100%" id="LabelGeoData"/>
+							<Switch xmlns="sap.m" id="SwitchGeoData" state="{motoSetup>/GeoData}"/>
 						</sap.ui.layout.form:content>
 					</sap.ui.layout.form:SimpleForm>
 				</content>
@@ -27,6 +29,7 @@
 			        <content>
 			        	<ToolbarSpacer/>
 			        	<Button xmlns="sap.m" text="Logs" id="ButtonMotoLogger" icon="sap-icon://list" press="onDisplayLogs"/>
+			        	<Button xmlns="sap.m" text="Clear" id="ButtonMotoSetupClear" icon="sap-icon://delete" press="onClearPress"/>
 			        	<Button text="Save" width="100px" id="ButtonMotoSetupSave" press="onSavePress" icon="sap-icon://save"/>
 			        </content>
 			    </Toolbar>

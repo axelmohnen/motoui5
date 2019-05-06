@@ -5,8 +5,9 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"motoui5/motoui5/libs/evothings/evothings",
 	"sap/m/MessageToast",
-	"sap/ui/model/Filter"
-], function (Controller, JSONModel, evothingsjs, MessageToast, Filter) {
+	"sap/ui/model/Filter",
+	"sap/ui/core/IntervalTrigger"
+], function (Controller, JSONModel, evothingsjs, MessageToast, Filter, IntervalTrigger) {
 	"use strict";
 	var ble = null;
 	var that = null;
@@ -156,11 +157,27 @@ sap.ui.define([
 			this.onStartUp();
 
 			//Perform BLE connection
-			this.onDeviceReady();
+			//this.onDeviceReady();
 
-			//Init Geolocation API
-			this.initGeo();
+			//Set routing event handler
+			this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+			this._oRouter.attachRouteMatched(this.handleRouteMatched, this);
 
+		},
+
+		handleRouteMatched: function (evt) {
+			//Check whether the VIEW1 page has been entered.
+			if (evt.getParameter("config").name === "View1") {
+				//Get offline Storage object to use
+				var oMotoData = that.getMotoData();
+
+				//Set interval for GeoData if requested
+				if (oMotoData.GeoData) {
+					that.startGeoData();
+				} else {
+					that.stopGeoData();
+				}
+			}
 		},
 
 		initConnectData: function () {
@@ -178,15 +195,9 @@ sap.ui.define([
 			this.sSerialData = "";
 		},
 
-		initGeo: function () {
-			navigator.geolocation.watchPosition(
-				this.onGeoSuccess,
-				this.onGeoFailure, {
-					enableHighAccuracy: true,
-					maximumAge: 0,
-					timeout: 5000
-				}
-			);
+		startGeo: function () {
+			navigator.geolocation.getCurrentPosition(this.onGeoSuccess,
+				this.onGeoFailure);
 		},
 
 		onBeforeRendering: function () {},
@@ -206,25 +217,25 @@ sap.ui.define([
 			//aInfoItems2[0].addStyleClass("customMLIBShowSeparatorFirst");
 		},
 
-		onGeoSuccess: function (event) {
+		onGeoSuccess: function (position) {
 			//Set Speed
-			if (event.coords.speed) {
-				that.sGeoSpeed = event.coords.speed.toString();
+			if (position.coords.speed) {
+				that.sGeoSpeed = position.coords.speed.toString();
 			}
 
 			//Set Latitude
-			if (event.coords.latitude) {
-				that.sGeoLat = event.coords.latitude.toString();
+			if (position.coords.latitude) {
+				that.sGeoLat = position.coords.latitude.toString();
 			}
 
 			//Set Longitude
-			if (event.coords.longitude) {
-				that.sGeoLon = event.coords.longitude.toString();
+			if (position.coords.longitude) {
+				that.sGeoLon = position.coords.longitude.toString();
 			}
 
 			//Set Altitude
-			if (event.coords.altitude) {
-				that.sGeoAlt = event.coords.altitude.toString();
+			if (position.coords.altitude) {
+				that.sGeoAlt = position.coords.altitude.toString();
 			}
 
 			//Set Angle
@@ -235,7 +246,21 @@ sap.ui.define([
 			that.updateTableInfoList();
 		},
 
-		onGeoFailure: function (event) {
+		onGeoFailure: function (error) {
+			switch (error.code) {
+			case 1:
+				that.setLog("Error", "Geo Failure - permission denied");
+				break;
+			case 2:
+				that.setLog("Error", "Geo Failure - permission denied");
+				break;
+			case 3:
+				that.setLog("Error", "Geo Failure - permission denied");
+				break;
+			default:
+				that.setLog("Error", "Geo Failure - permission denied");
+				break;
+			}
 			that.setLog("Error", "Geo Failure");
 			return 0;
 		},
@@ -289,6 +314,7 @@ sap.ui.define([
 					KmOffset: 0,
 					SpeedOffset: 0,
 					RpmOffset: 0,
+					GeoData: false,
 					Info: []
 				};
 				//Set data into Storage
@@ -986,6 +1012,32 @@ sap.ui.define([
 					this.getOwnerComponent().getRouter().navTo(oNavigation.routeName);
 				}
 			}
+		},
+
+		startGeoData: function () {
+			//Create Trigger and register handler
+			if (!this.oTrigger) {
+				this.oTrigger = new sap.ui.core.IntervalTrigger();
+			} else {
+				//Stop Trigger
+				this.oTrigger.removeListener(this.triggerGeoData, this);
+			}
+
+			//Start new trigger
+			this.oTrigger.addListener(this.triggerGeoData, this);
+			this.oTrigger.setInterval(500);
+		},
+
+		stopGeoData: function () {
+			//Stop Trigger
+			if (this.oTrigger) {
+				this.oTrigger.removeListener(this.triggerGeoData, this);
+			}
+		},
+
+		triggerGeoData: function () {
+			//Fetch GEO data 
+			this.startGeo();
 		}
 	});
 });
